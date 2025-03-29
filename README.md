@@ -33,7 +33,7 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 3. Access the API at http://localhost:8000
 4. Access the Swagger documentation at http://localhost:8000/docs
 
-### Option 2: Running Locally with Python
+### Option 2: Running Locally
 
 1. Clone the repository:
    ```bash
@@ -93,20 +93,20 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 8. Access the Swagger documentation at http://localhost:8000/docs
 
 ## Project Structure
-
-python-crud/
-├── app/
-│ ├── crud.py # CRUD operations
-│ ├── database.py # Database connection
-│ ├── main.py # FastAPI application
-│ ├── models.py # SQLAlchemy models
-│ ├── requirements.txt # Python dependencies
-│ └── schemas.py # Pydantic schemas
-├── Dockerfile # Docker configuration
-├── docker-compose.yml # Docker Compose configuration
-├── init.sql # SQL initialization script
-└── README.md # Project documentation
-
+   ```bash
+   python-crud/
+   ├── app/
+   │ ├── crud.py             # CRUD operations
+   │ ├── database.py         # Database connection
+   │ ├── main.py             # FastAPI application
+   │ ├── models.py           # SQLAlchemy models
+   │ ├── requirements.txt    # Python dependencies
+   │ └── schemas.py          # Pydantic schemas
+   ├── Dockerfile            # Docker configuration
+   ├── docker-compose.yml    # Docker Compose configuration
+   ├── init.sql              # SQL initialization script
+   └── README.md             # Project documentation
+  ```
 
 ## API Endpoints
 
@@ -132,9 +132,6 @@ python-crud/
     curl -X GET http://localhost:8000/users/1
    ```
 
-   ```bash
-   
-   ```
 ### Create a new user
    ```bash
     curl -X POST http://localhost:8000/users/ \
