@@ -10,10 +10,10 @@ services:
       MYSQL_DATABASE: crud_db
       MYSQL_USER: crud_user
       MYSQL_PASSWORD: crud_password
-    # ports:
-    #   - "3306:3306"
+    ports:
+      - "3306:3306"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql      
+      - ./app/db/init.sql:/docker-entrypoint-initdb.d/init.sql      
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "crud_user", "--password=crud_password"]
       interval: 5s
@@ -35,3 +35,26 @@ services:
       MYSQL_PORT: 3306
     ports:
       - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./app/prometheus/:/etc/prometheus/
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"     
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app/grafana/provisioning:/etc/grafana/provisioning
+    env_file:
+      - ./app/grafana/config.monitoring
+    depends_on:
+      - prometheus        

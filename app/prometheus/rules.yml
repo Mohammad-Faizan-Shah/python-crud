@@ -1,0 +1,21 @@
+groups:
+  - name: crudapp-alerts
+    rules:
+      - alert: AppDown
+        expr: up == 0
+        for: 10s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Application is down"
+          description: "The CrudApp application is not responding to Prometheus scrapes for more than 1 minute."
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Response Time"
+          description: "The 95th percentile response time has exceeded 1s for more than 5 minutes."
+
