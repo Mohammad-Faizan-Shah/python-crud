@@ -22,6 +22,11 @@ def get_db():
 
 
 
+@app.get("/health", status_code=status.HTTP_200_OK)
+def ping():
+    """Health check endpoint"""
+    return {"status": "success"}
+
 @app.post("/users/", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     """Create a new user"""
