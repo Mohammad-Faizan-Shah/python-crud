@@ -12,10 +12,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_SECRET }}" | docker login -u "${{ var.DOCKER_USER }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_SECRET }}" | docker login -u "${{ vars.DOCKER_USER }}" --password-stdin
+
+      - name: Set Docker Repo Name and Tag
+        run: |
+          echo "DOCKER_REPO=${GITHUB_REPOSITORY##*/}" >> $GITHUB_ENV
+          echo "DOCKER_TAG=${{ vars.DOCKER_TAG || 'latest' }}" >> $GITHUB_ENV
 
       - name: Build Docker Image
-        run: docker build -t "${{ var.DOCKER_USER }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }} ."
+        run: docker build -t "${{ vars.DOCKER_USER }}/$DOCKER_REPO:$DOCKER_TAG" .
 
       - name: Push Docker Image
-        run: docker push "${{ var.DOCKER_USER }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }}"
+        run: docker push "${{ vars.DOCKER_USER }}/$DOCKER_REPO:$DOCKER_TAG"
