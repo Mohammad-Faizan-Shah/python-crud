@@ -11,10 +11,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_SECRET }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_SECRET }}" | docker login -u "${{ var.DOCKER_USER }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t "${{ var.DOCKER_REG }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }} ."
+        run: docker build -t "${{ var.DOCKER_USER }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }} ."
 
       - name: Push Docker Image
-        run: docker push "${{ var.DOCKER_REG }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }}"
+        run: docker push "${{ var.DOCKER_USER }}"/"${{ vars.DOCKER_REPO }}:${{ vars.DOCKER_TAG || 'latest' }}"
