@@ -3,7 +3,7 @@ groups:
     rules:
       - alert: AppDown
         expr: up == 0
-        for: 10s
+        for: 2m
         labels:
           severity: critical
         annotations:
@@ -12,7 +12,7 @@ groups:
 
       - alert: HighResponseTime
         expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
-        for: 10s
+        for: 5m
         labels:
           severity: warning
         annotations:
