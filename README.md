@@ -33,6 +33,21 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 3. Access the API at http://localhost:8000
 4. Access the Swagger documentation at http://localhost:8000/docs
 
+### Accessing Prometheus
+
+1. Access the Prometheus UI at http://localhost:9090
+2. Use this interface to:
+   - Query metrics using PromQL
+   - View targets and their health
+   - Check configured alert rules
+
+### Accessing Grafana
+
+1. Access the Grafana dashboard at http://localhost:3000
+2. Login credentials:
+   - Username: `admin`
+   - Password: `crud@123`
+
 ### Option 2: Running Locally
 
 1. Clone the repository:
@@ -122,7 +137,7 @@ You need a MySQL database for the CRUD application to store data. You can deploy
 
 3. Create a database and user for the CRUD application:
    
-   # Connect to MySQL and create database and user
+   Connect to MySQL and create database and user
    kubectl exec -it mysql-innodbcluster-0 -- mysql -uroot -prootpassword -e "
    CREATE DATABASE crud_db;
    CREATE USER 'crud_user'@'%' IDENTIFIED BY 'crud_password';
