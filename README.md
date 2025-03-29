@@ -13,7 +13,7 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 
 - Python 3.9+
 - MySQL
-- Docker and Docker Compose (optional)
+- Docker and Docker Compose 
 
 ## Getting Started
 
@@ -21,13 +21,13 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/python-crud.git
+   git clone https://github.com/Mohammad-Faizan-Shah/python-crud.git
    cd python-crud
    ```
 
 2. Start the application using Docker Compose:
    ```bash
-   docker-compose up
+   docker-compose up --build
    ```
 
 3. Access the API at http://localhost:8000
@@ -47,12 +47,17 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 2. Login credentials:
    - Username: `admin`
    - Password: `crud@123`
+3. The CrudApp dashboard is pre-configured with panels for:
+   - Application uptime
+   - CPU and memory usage
+   - HTTP request rates and response times
+   - Request/response sizes   
 
 ### Option 2: Running Locally
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/python-crud.git
+   git clone https://github.com/Mohammad-Faizan-Shah/python-crud.git
    cd python-crud
    ```
 
