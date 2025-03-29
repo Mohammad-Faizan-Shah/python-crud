@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    container_name: crud-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: crud_app
+      MYSQL_DATABASE: crud_db
+      MYSQL_USER: crud_user
+      MYSQL_PASSWORD: crud_password
+    # ports:
+    #   - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql      
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "crud_user", "--password=crud_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 15s      
+
+  crud_app:
+    build: .
+    container_name: crud-app
+    depends_on:
+      db:
+        condition: service_healthy   
+    environment:
+      MYSQL_USER: crud_user
+      MYSQL_PASSWORD: crud_password
+      MYSQL_DB: crud_db
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+    ports:
+      - "8000:8000"
