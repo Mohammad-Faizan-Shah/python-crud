@@ -1,14 +1,17 @@
-   apiVersion: monitoring.coreos.com/v1
-   kind: ServiceMonitor
-   metadata:
-     name: crud-app-monitor
-     labels:
-       release: prometheus
-   spec:
-     selector:
-       matchLabels:
-         app.kubernetes.io/name: crud-app
-     endpoints:
-     - port: http
-       path: /metrics
-       interval: 15s
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "crud-app.fullname" . }}
+  labels:
+    {{- include "crud-app.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "crud-app.selectorLabels" . | nindent 6 }}
+  endpoints:
+    {{- toYaml .Values.serviceMonitor.endpoints | nindent 4 }}
+{{- end }}

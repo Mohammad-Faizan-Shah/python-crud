@@ -2,6 +2,19 @@
 
 A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQLAlchemy, and MySQL.
 
+## CI/CD Pipeline
+
+This project includes a GitHub Actions workflow that automatically builds and pushes images to the registry when code is pushed to the main branch.
+
+### GitHub Actions Workflow
+
+The workflow performs the following steps:
+- Builds the Docker image
+- Pushes the image to Docker Hub
+
+You can view the workflow configuration in `.github/workflows/main.yml`:
+
+
 ## Features
 
 - RESTful API with FastAPI
@@ -9,223 +22,27 @@ A simple CRUD (Create, Read, Update, Delete) application built with FastAPI, SQL
 - Docker containerization
 - Swagger UI documentation
 
-## Prerequisites
-
-- Python 3.9+
-- MySQL
-- Docker and Docker Compose 
-
-## Getting Started
-
-### Option 1: Running with Docker (Recommended)
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Mohammad-Faizan-Shah/python-crud.git
-   cd python-crud
-   ```
-
-2. Start the application using Docker Compose:
-   ```bash
-   docker-compose up --build
-   ```
-
-3. Access the API at http://localhost:8000
-4. Access the Swagger documentation at http://localhost:8000/docs
-
-### Accessing Prometheus
-
-1. Access the Prometheus UI at http://localhost:9090
-2. Use this interface to:
-   - Query metrics using PromQL
-   - View targets and their health
-   - Check configured alert rules
-
-### Accessing Grafana
-
-1. Access the Grafana dashboard at http://localhost:3000
-2. Login credentials:
-   - Username: `admin`
-   - Password: `crud@123`
-3. The CrudApp dashboard is pre-configured with panels for:
-   - Application uptime
-   - CPU and memory usage
-   - HTTP request rates and response times
-   - Request/response sizes   
-
-### Option 2: Running Locally
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Mohammad-Faizan-Shah/python-crud.git
-   cd python-crud
-   ```
-
-2. Create and activate a virtual environment:
-   ```bash
-   # On macOS/Linux
-   python -m venv venv
-   source venv/bin/activate
-
-   # On Windows
-   python -m venv venv
-   venv\Scripts\activate
-   ```
-
-3. Install the required dependencies:
-   ```bash
-   pip install -r app/requirements.txt
-   ```
-
-4. Set up MySQL:
-   - Ensure MySQL is running on your machine
-   - Create a database named `crud_db`
-   - Create a user `crud_user` with password `crud_password` (or update the environment variables)
-   - Run the SQL script to create tables and sample data:
-     ```bash
-     mysql -u crud_user -p crud_db < init.sql
-     ```
-
-5. Set environment variables:
-   ```bash
-   # On macOS/Linux
-   export MYSQL_USER=crud_user
-   export MYSQL_PASSWORD=crud_password
-   export MYSQL_DB=crud_db
-   export MYSQL_HOST=localhost
-   export MYSQL_PORT=3306
-
-   # On Windows
-   set MYSQL_USER=crud_user
-   set MYSQL_PASSWORD=crud_password
-   set MYSQL_DB=crud_db
-   set MYSQL_HOST=localhost
-   set MYSQL_PORT=3306
-   ```
-
-6. Run the application:
-   ```bash
-   cd app
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-   ```
-
-7. Access the API at http://localhost:8000
-8. Access the Swagger documentation at http://localhost:8000/docs
-
-### Option 3: Deploying to Kubernetes with Helm
-
-#### Prerequisites for Kubernetes Deployment
-
-1. A Kubernetes cluster (v1.19+)
-2. Helm 3+ installed
-3. MySQL database in Kubernetes
-4. Prometheus monitoring stack installed
-
-#### Setting up MySQL in Kubernetes
-
-You need a MySQL database for the CRUD application to store data. You can deploy MySQL using the mysql-innodbcluster Helm chart:
-
-1. Add the MySQL Operator Helm repository:
-   ```bash
-   helm repo add mysql-operator https://mysql.github.io/mysql-operator/
-   helm repo update
-   ```
-
-2. Install MySQL InnoDB Cluster:
-   ```bash
-   helm install mysql mysql-operator/mysql-innodbcluster \
-     --set credentials.root.password=rootpassword \
-     --set credentials.root.host='%' \
-     --set serverInstances=1 \
-     --set podAnnotations."prometheus\.io/scrape"=true
-   ```
-
-3. Create a database and user for the CRUD application:
-   
-   Connect to MySQL and create database and user
-   kubectl exec -it mysql-innodbcluster-0 -- mysql -uroot -prootpassword -e "
-   CREATE DATABASE crud_db;
-   CREATE USER 'crud_user'@'%' IDENTIFIED BY 'crud_password';
-   GRANT ALL PRIVILEGES ON crud_db.* TO 'crud_user'@'%';
-   FLUSH PRIVILEGES;"
-   ```
-
-#### Setting up Prometheus Monitoring Stack
-
-The CRUD application exposes Prometheus metrics that can be collected and visualized. Install the kube-prometheus-stack for comprehensive monitoring:
-
-1. Add the Prometheus community Helm repository:
-   ```bash
-   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-   helm repo update
-   ```
-
-2. Install kube-prometheus-stack:
-   ```bash
-   helm install prometheus prometheus-community/kube-prometheus-stack \
-     --set grafana.adminPassword=admin \
-     --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
-   ```
-
-3. A ServiceMonitor for the CRUD application will create CRUD Helm:
- 
-
-4. Access Prometheus and Grafana:
-   ```bash
-   # Port-forward Prometheus
-   kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
-   # Access at http://localhost:9090
-   
-   # Port-forward Grafana
-   kubectl port-forward svc/prometheus-grafana 3000:80
-   # Access at http://localhost:3000 (user: admin, password: admin)
-   ```
-
-#### Deploying the CRUD Application
-
-1. Create a Kubernetes secret for MySQL credentials:
-   ```bash
-   kubectl create secret generic mysql-secret --from-literal=MYSQL_PASSWORD=crud_password
-   ```
-
-2. Install the application using the Helm chart:
-   ```bash
-   # From the project root directory
-   helm install crud-app ./helm-chart \
-     --set EnvVars.MYSQL_HOST=mysql-innodbcluster \
-     --set EnvVars.MYSQL_USER=crud_user \
-     --set EnvVars.MYSQL_DB=crud_db \
-     --set EnvVars.MYSQL_PORT=6446
-   ```
-
-3. Access the application:
-   ```bash
-   # If using Ingress
-   # Add the following to your /etc/hosts file:
-   # 127.0.0.1 crud-app.local
-   
-   # Then access: http://crud-app.local
-   
-   # Or use port-forwarding
-   kubectl port-forward svc/crud-app 8000:80
-   # Then access: http://localhost:8000
-   ```
-
 ## Project Structure
    ```bash
    python-crud/
    ├── app/
    │ ├── crud.py             # CRUD operations
    │ ├── database.py         # Database connection
-   │ ├── main.py             # FastAPI application
-   │ ├── models.py           # SQLAlchemy models
-   │ ├── requirements.txt    # Python dependencies
-   │ └── schemas.py          # Pydantic schemas
-   ├── Dockerfile            # Docker configuration
-   ├── docker-compose.yml    # Docker Compose configuration
-   ├── init.sql              # SQL initialization script
-   └── README.md             # Project documentation
-  ```
+   │ ├── db/                 # Database related files
+   │ ├── grafana/            # Grafana dashboards and configs
+   │ ├── main.py            # FastAPI application
+   │ ├── models.py          # SQLAlchemy models
+   │ ├── prometheus/        # Prometheus configs and rules
+   │ ├── requirements.txt   # Python dependencies
+   │ └── schemas.py         # Pydantic schemas
+   ├── Dockerfile           # Docker configuration
+   ├── docker-compose.yml   # Docker Compose configuration
+   ├── helm-chart/         # Helm chart for k8s deployment
+   ├── ingressLB.yaml      # Ingress Load Balancer config
+   ├── kube-prometheus-stack/ # Prometheus operator stack
+   ├── terraform-eks/      # Terraform EKS configuration
+   └── README.md           # Project documentation
+   ```
 
 ## API Endpoints
 
@@ -266,59 +83,223 @@ The CRUD application exposes Prometheus metrics that can be collected and visual
     -d '{"name": "Updated Name", "email": "updated@example.com"}'  
    ```
 
-
 ### Delete a user   
 
    ```bash 
     curl -X DELETE http://localhost:8000/users/1
    ```
 
-## Monitoring
+## Prerequisites
 
-The application includes a monitoring stack with Prometheus and Grafana.
+- Python 3.9+
+- MySQL
+- Docker and Docker Compose 
+
+## Getting Started
+
+### Option 1: Running with Docker (Simplest)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Mohammad-Faizan-Shah/python-crud.git
+   cd python-crud
+   ```
+
+2. Start the application using Docker Compose:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. Access the services:
+   - CRUD Application: http://localhost:8000
+   - Grafana Dashboard: http://localhost:3000 (login with admin/crud@123)
+   - Prometheus: http://localhost:9090
+
+4. Monitor the application:
+   - View pre-configured CrudApp dashboards in Grafana showing:
+     - Application uptime
+     - CPU and memory usage 
+     - HTTP request rates and latencies
+     - System metrics
+
+5. Test alerting:
+   - Stop the application container:
+     ```bash
+     docker stop crud-app
+     ```
+   - Check Prometheus alerts at http://localhost:9090/alerts
+   - After ~2 minutes, you should see the AppDown alert trigger
+   - Restart the container to resolve the alert:
+     ```bash
+     docker start crud-app
+     ```
+
+### Option 2: Deploying to AWS EKS with Terraform and Helm
+
+#### Prerequisites for AWS EKS Deployment
+
+1. AWS CLI configured with appropriate credentials
+2. Terraform installed
+3. Helm 3+ installed
+4. kubectl installed
+
+Follow the Cloud Infra Setup guide in [terraform-eks/README.md](terraform-eks/README.md) to:
+
+1. Deploy an EKS cluster and RDS MySQL database using Terraform
+2. Configure kubectl to connect to your EKS cluster
+3. Set up the necessary IAM roles and policies
+
+### Deploying the Component required to run CRUD Application
+
+#### Setting up Ingress-Nginx Controller
+
+1. Deploy the Ingress-Nginx controller for AWS:
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.1/deploy/static/provider/aws/deploy.yaml
+   ```
+
+   Wait for the Load Balancer to be provisioned:
+   ```bash
+   kubectl get svc -n ingress-nginx
+   ```
+   
+   You should see an external IP/hostname for the `ingress-nginx-controller` service. This is your application's entry point.
+
+2. Create a Kubernetes secret for MySQL credentials:
+   ```bash
+   kubectl create secret generic mysql-secret --from-literal=MYSQL_PASSWORD="DBPASS"
+   ```
+     Use the same password you set in terraform.tfvars for the RDS instance
+
+3. Create a Docker registry secret for pulling private images:
+   ```bash
+   kubectl create secret docker-registry my-docker-secret \
+     --docker-server=<your-registry-url> \
+     --docker-username=<your-username> \
+     --docker-password=<your-password> \
+     --docker-email=<your-email>
+   ```
+
+   Patch the default service account to use this secret:
+   ```bash
+   kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "my-docker-secret"}]}'
+   ```
+
+4. Install the application using the Helm chart:
+   ```bash
+   # From the project root directory
+   helm install crud-app ./helm-chart \
+     --set EnvVars.MYSQL_HOST=mysql-innodbcluster \
+     --set EnvVars.MYSQL_USER=crud_user \
+     --set EnvVars.MYSQL_DB=crud_db \
+     --set EnvVars.MYSQL_PORT=6446
+   ```
+
+#### Setting up Prometheus Monitoring Stack
+
+The CRUD application exposes Prometheus metrics that can be collected and visualized. Install the kube-prometheus-stack for comprehensive monitoring:
+
+1. Install kube-prometheus-stack:
+   ```bash
+   helm install prometheus kube-prometheus-stack/ 
+   ```
+
+   You can customize the hostnames for Prometheus and Grafana during installation:
+   ```bash
+   helm install prometheus kube-prometheus-stack/ \
+     --set prometheus.ingress.hosts[0]=prometheus.example.com \
+     --set grafana.ingress.hosts[0]=grafana.example.com
+   ```
+
+2. By default, the chart will create ingress resources for both Prometheus and Grafana with the following hostnames:
+   - Prometheus: prometheus.local.com
+   - Grafana: grafana.local.com
+
+4. Get the Grafana admin password if you didn't set a custom one:
+   ```bash
+   kubectl get secret prometheus-grafana -o jsonpath="{.data.admin-password}" | base64 -d; echo
+   ```
+
+📌 Note: A pre-configured CrudApp Grafana dashboard will be installed automatically. You can access it after deploying the application.
+
+
+#### Deploying the CRUD Application
+
+1. The Helm chart will create an Ingress resource for the application with the following hostname:
+   - CRUD App: crud-app.local.com
+
+   You can customize the hostname during installation:
+   ```bash
+   helm install crud-app ./helm-chart \
+     --set ingress.hosts[0]=your-custom-domain.com \
+     --set EnvVars.MYSQL_HOST="<your-mysql-endpoint-from-terraform>" \
+     --set EnvVars.MYSQL_USER="<mysql-user>" \
+     --set EnvVars.MYSQL_DB="<mysql-db-from-terraform>" \
+     --set EnvVars.MYSQL_PORT=3306
+   ```
+ 📌 Notes: A pre-configured ServiceMonitor for the CRUD application will be created with Helm to scrap metrics from CrudApp
+
+
+## Access the Application and Monitor
+
+1. If you can't access the ingress LB directly, use port-forwarding:
+   ```bash
+   kubectl port-forward svc/ingress-nginx-controller 80:80 --address=0.0.0.0 -n ingress-nginx
+   ```   
+2. Access the Application Monitoring Services:
+    Add the following to your /etc/hosts file:
+   ```bash
+    127.0.0.1 crud-app.local.com grafana.local.com prometheus.local.com
+   ```
+### Accessing CrudApp
+
+1. Access the CRUD application at http://crud-app.local.com
+
+2. Using curl to interact with the API:
+   ```bash
+   # Create a new item
+   curl -X POST http://crud-app.local.com/items \
+     -H "Content-Type: application/json" \
+     -d '{"name": "test item", "description": "test description"}'
+
+   # Get all items
+   curl http://crud-app.local.com/items
+
+   # Get a specific item
+   curl http://crud-app.local.com/items/{id}
+
+   # Update an item
+   curl -X PUT http://crud-app.local.com/items/{id} \
+     -H "Content-Type: application/json" \
+     -d '{"name": "updated item", "description": "updated description"}'
+
+   # Delete an item
+   curl -X DELETE http://crud-app.local.com/items/{id}
+   ```
+
+3. Using Swagger UI:
+   - Access the Swagger documentation at http://crud-app.local.com/docs
+   - The interactive UI allows you to:
+     - View all available API endpoints
+     - Test API operations directly from the browser
+     - See request/response schemas
+     - Execute requests and view responses in real-time
+
+### Accessing Grafana
+
+1. Access the Grafana dashboard at http://grafana.local.com
+   - Username: `admin`
+   - Password: `YouFetchedWhileDeploying` 
+2. The CrudApp dashboard is pre-configured with panels for:
+   - Application uptime
+   - CPU and memory usage
+   - HTTP request rates and response times
+   - Request/response sizes     
 
 ### Accessing Prometheus
 
-1. Access the Prometheus UI at http://localhost:9090
+1. Access the Prometheus UI at http://prometheus.local.com
 2. Use this interface to:
    - Query metrics using PromQL
    - View targets and their health
    - Check configured alert rules
-
-### Accessing Grafana
-
-1. Access the Grafana dashboard at http://localhost:3000
-2. Login credentials:
-   - Username: `admin`
-   - Password: `crud@123`
-3. The CrudApp dashboard is pre-configured with panels for:
-   - Application uptime
-   - CPU and memory usage
-   - HTTP request rates and response times
-   - Request/response sizes
-
-### Testing Alerts
-
-You can test the monitoring alerts by:
-
-1. Stopping the CRUD app container:
-   ```bash
-   docker stop crud-app
-   ```
-
-2. After approximately 2 minutes, the "AppDown" alert will trigger in Prometheus
-   - View active alerts at http://localhost:9090/alerts
-
-3. Restart the container to resolve the alert:
-   ```bash
-   docker start crud-app
-   ```
-
-### Available Metrics
-
-The application exposes various metrics including:
-- `http_requests_total` - Total number of HTTP requests by status code
-- `http_request_duration_seconds` - HTTP request latency distribution
-- `process_resident_memory_bytes` - Memory usage of the application
-- `process_cpu_seconds_total` - CPU usage of the application
-

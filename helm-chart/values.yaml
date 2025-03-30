@@ -22,7 +22,7 @@ fullnameOverride: ""
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Automatically mount a ServiceAccount's API credentials?
   automount: true
   # Annotations to add to the service account
@@ -52,9 +52,11 @@ securityContext: {}
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: NodePort
+  type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 80
+  # This sets the target port that the service will forward traffic to in the pod
+  targetPort: 8000
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -64,7 +66,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: crud-app.local
+    - host: crud-app.local.com
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -124,8 +126,20 @@ EnvVars:
   MYSQL_SECRET_NAME: mysql-secret
   MYSQL_SECRET_KEY: MYSQL_PASSWORD
   MYSQL_DB: crud_db
-  MYSQL_HOST: db
+  MYSQL_HOST: crud-mysql-db.cutqeg2u2fv5.us-east-1.rds.amazonaws.com
   MYSQL_PORT: "3306"
+
+# ServiceMonitor configuration
+serviceMonitor:
+  enabled: true
+  # Additional labels for the ServiceMonitor
+  labels:
+    release: prometheus
+  # Endpoint configurations
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
 
 # Additional volumes on the output Deployment definition.
 volumes: []
