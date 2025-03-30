@@ -8,7 +8,24 @@ variable "vpc_cidr" {
   description = "default CIDR range of the VPC"
 }
 variable "aws_region" {
-  default = "ap-south-1"
+  default = "us-east-1"
   description = "aws region"
 }
 
+variable "db_username" {
+  description = "Username for the RDS MySQL instance"
+  type        = string
+  default     = "crud_user"
+}
+
+variable "db_password" {
+  description = "Password for the RDS MySQL instance"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_name" {
+  description = "Name of the database to create"
+  type        = string
+  default     = "crud_db"
+}
