@@ -185,16 +185,6 @@ Follow the Cloud Infra Setup guide in [terraform-eks/README.md](terraform-eks/RE
    kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "my-docker-secret"}]}'
    ```
 
-4. Install the application using the Helm chart:
-   ```bash
-   # From the project root directory
-   helm install crud-app ./helm-chart \
-     --set EnvVars.MYSQL_HOST=mysql-innodbcluster \
-     --set EnvVars.MYSQL_USER=crud_user \
-     --set EnvVars.MYSQL_DB=crud_db \
-     --set EnvVars.MYSQL_PORT=6446
-   ```
-
 #### Setting up Prometheus Monitoring Stack
 
 The CRUD application exposes Prometheus metrics that can be collected and visualized. Install the kube-prometheus-stack for comprehensive monitoring:
